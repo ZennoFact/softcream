@@ -110,12 +110,16 @@ class SoftCreamGame {
     
     initControls() {
         // タッチ開始
-        this.canvas.addEventListener('touchstart', (e) => {
+        this.canvas.addEventListener('touchstart', async (e) => {
             e.preventDefault();
             this.isTouching = true;
             
             if (!this.isPlaying && !this.gameOver) {
-                this.requestSensorPermission();
+                await this.requestSensorPermission();
+                this.startGame();
+            } else if (this.gameOver) {
+                // ゲームオーバー状態からリスタート
+                await this.requestSensorPermission();
                 this.startGame();
             }
         });
@@ -208,8 +212,7 @@ class SoftCreamGame {
                 segment.y += segment.vy;
                 
                 // コーンとの衝突判定
-                if (this.iceCreamSegments.length === 1 && 
-                    this.checkConeCollision(segment)) {
+                if (this.checkConeCollision(segment)) {
                     segment.settled = true;
                     segment.vy = 0;
                     segment.vx = 0;
